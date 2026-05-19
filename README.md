@@ -1,4 +1,4 @@
-<img width="512" height="512" alt="No more U+ animation." src="https://github.com/user-attachments/assets/e19bafb7-310d-4c0b-bbea-7433b1865192" />
+<img width="256" height="256" alt="No more U+ animation." src="https://github.com/user-attachments/assets/e19bafb7-310d-4c0b-bbea-7433b1865192" />
 
 
 # VegaXtUdio - Vega X U+ Model Boot Animation Converter
