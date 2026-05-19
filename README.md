@@ -1,4 +1,4 @@
-# Vega X U+ Boot Animation Converter
+# VegaXtUdio - Vega X U+ Boot Animation Converter
 
 This tool converts a normal Android boot animation folder made of PNG frames into the Pantech Vega X U+ / EF14L Android 2.3.4 boot animation format.
 
