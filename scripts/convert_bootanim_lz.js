@@ -11,7 +11,7 @@ const CHUNK_BYTES = 0x10000;
 
 function usage() {
   return `
-Vega X U+ boot animation converter
+VegaXtUdio - Vega X U+ boot animation converter
 
 Usage:
   node scripts/convert_bootanim_lz.js --input BootAnim --output bootanimation.zip
