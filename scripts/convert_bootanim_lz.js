@@ -8,10 +8,11 @@ const ATC_MAGIC = 0xccc40002;
 const ATC_RGB_FLAG = 1;
 const LZ_VERSION = 4;
 const CHUNK_BYTES = 0x10000;
+let CHANNEL_ORDER = "bgr";
 
 function usage() {
   return `
-VegaXtUdio - Vega X U+ boot animation converter
+Vega X U+ boot animation converter
 
 Usage:
   node scripts/convert_bootanim_lz.js --input BootAnim --output bootanimation.zip
@@ -21,6 +22,8 @@ Options:
   --workdir <dir>   Folder for generated .lz frames. Default: <input>_lz
   --output <zip>    Output bootanimation.zip path. Default: bootanimation.zip
   --copy-to <zip>   Also copy the output zip to another path.
+  --channel-order <bgr|rgb>
+                    ATC endpoint channel packing. Default: bgr for Vega X U+.
   --help            Show this help.
 
 Legacy positional form still works:
@@ -34,6 +37,7 @@ function parseArgs(argv) {
     workdir: null,
     output: null,
     copyTo: null,
+    channelOrder: "bgr",
     help: false,
   };
   const positional = [];
@@ -50,6 +54,8 @@ function parseArgs(argv) {
       args.output = argv[++i];
     } else if (arg === "--copy-to") {
       args.copyTo = argv[++i];
+    } else if (arg === "--channel-order") {
+      args.channelOrder = argv[++i];
     } else if (arg.startsWith("--")) {
       throw new Error(`Unknown option: ${arg}`);
     } else {
@@ -63,6 +69,9 @@ function parseArgs(argv) {
   if (!args.input) args.input = "BootAnim";
   if (!args.workdir) args.workdir = `${args.input.replace(/[\\/]$/, "")}_lz`;
   if (!args.output) args.output = "bootanimation.zip";
+  if (!["rgb", "bgr"].includes(args.channelOrder)) {
+    throw new Error(`--channel-order must be rgb or bgr, got: ${args.channelOrder}`);
+  }
   return args;
 }
 
@@ -204,14 +213,23 @@ function expandQuantized(v, bits) {
 }
 
 function packAtcC0(r, g, b) {
+  if (CHANNEL_ORDER === "bgr") return (b >> 3) | ((g >> 3) << 5) | ((r >> 3) << 10);
   return (r >> 3) | ((g >> 3) << 5) | ((b >> 3) << 10);
 }
 
 function packAtcC1(r, g, b) {
+  if (CHANNEL_ORDER === "bgr") return (b >> 3) | ((g >> 2) << 5) | ((r >> 3) << 11);
   return (r >> 3) | ((g >> 2) << 5) | ((b >> 3) << 11);
 }
 
 function unpackAtcC0(c) {
+  if (CHANNEL_ORDER === "bgr") {
+    return [
+      expandQuantized((c >> 10) & 0x1f, 5),
+      expandQuantized((c >> 5) & 0x1f, 5),
+      expandQuantized(c & 0x1f, 5),
+    ];
+  }
   return [
     expandQuantized(c & 0x1f, 5),
     expandQuantized((c >> 5) & 0x1f, 5),
@@ -220,6 +238,13 @@ function unpackAtcC0(c) {
 }
 
 function unpackAtcC1(c) {
+  if (CHANNEL_ORDER === "bgr") {
+    return [
+      expandQuantized((c >> 11) & 0x1f, 5),
+      expandQuantized((c >> 5) & 0x3f, 6),
+      expandQuantized(c & 0x1f, 5),
+    ];
+  }
   return [
     expandQuantized(c & 0x1f, 5),
     expandQuantized((c >> 5) & 0x3f, 6),
@@ -570,6 +595,7 @@ function main() {
   const root = path.resolve(args.input);
   const outRoot = path.resolve(args.workdir);
   const outZip = path.resolve(args.output);
+  CHANNEL_ORDER = args.channelOrder;
   const frames = validateSource(root);
 
   fs.rmSync(outRoot, { recursive: true, force: true });
@@ -591,6 +617,7 @@ function main() {
   console.log(`Wrote ${outRoot}`);
   console.log(`Wrote ${outZip}`);
   console.log(`Frames: part0=${frames.part0.length}, part1=${frames.part1.length}`);
+  console.log(`Channel order: ${CHANNEL_ORDER}`);
   if (args.copyTo) console.log(`Copied output to ${path.resolve(args.copyTo)}`);
 }
 
