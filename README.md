@@ -1,3 +1,6 @@
+<img width="512" height="512" alt="No more U+ animation." src="https://github.com/user-attachments/assets/e19bafb7-310d-4c0b-bbea-7433b1865192" />
+
+
 # VegaXtUdio - Vega X U+ Model Boot Animation Converter
 
 This tool converts a normal Android boot animation folder made of PNG frames into the Pantech Vega X U+ model / EF14L Android 2.3.4 boot animation format.
