@@ -1,0 +1,13 @@
+{
+  "name": "vega-x-uplus-bootanim-converter",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Convert PNG boot animation folders to Vega X U+ EF14L .lz bootanimation.zip packages.",
+  "scripts": {
+    "convert": "node scripts/convert_bootanim_lz.js",
+    "help": "node scripts/convert_bootanim_lz.js --help"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
